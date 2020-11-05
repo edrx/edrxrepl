@@ -1,0 +1,36 @@
+* edrxrepl
+A simple [[https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop][REPL]] for Lua.
+
+# (find-eepitch-intro)
+# (brg "~/edrxrepl/README.html")
+
+I wrote it because I was tired of not understanding the innards of Rob
+Hoelz's [[https://github.com/hoelzro/lua-repl/][lua-repl]]. As I use [[http://angg.twu.net/eev-intros/find-eepitch-intro.html][eepitch]] I need very few features from my
+REPLs.
+
+The documentation is [[http://angg.twu.net/edrxrepl/edrxrepl.lua.html][here]].
+
+An example of how to use it:
+
+#+BEGIN_SRC
+cd ~/edrxrepl/
+/home/edrx/edrxrepl(edrx:sc)# lua5.3
+Lua 5.3.3  Copyright (C) 1994-2016 Lua.org, PUC-Rio
+> dofile "edrxrepl.lua"
+> REPL = Repl.new(); REPL:repl()
+>>> print(
+...   1+2
+... )
+3
+>>> = 1+2
+3
+>>> = 1, 2, 3
+1	2	3
+>>> = nil, 22
+nil	22
+>>> REPL.stop = 1
+> os.exit()
+/home/edrx/edrxrepl(edrx:sc)# 
+#+END_SRC
+
+Version: 2020nov03.

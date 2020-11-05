@@ -2,13 +2,14 @@
 --    http://angg.twu.net/edrxrepl/edrxrepl.lua.html
 --    http://angg.twu.net/edrxrepl/edrxrepl.lua
 --     (find-angg        "edrxrepl/edrxrepl.lua")
+--         https://github.com/edrx/edrxrepl
 --
 -- In the HTML version the sexp hyperlinks work.
 -- See: (find-eev-quick-intro "3. Elisp hyperlinks")
 --      (find-eepitch-intro "3. Test blocks")
 --
 -- Author:  Eduardo Ochs <eduardoochs@gmail.com>
--- Version: 2020oct28
+-- Version: 2020nov03
 -- License: GPL3 at this moment.
 -- If you need another license, get in touch!
 
