@@ -3,7 +3,7 @@
 #   http://angg.twu.net/edrxrepl/README.org
 #           (find-angg "edrxrepl/README.org")
 # Author: Eduardo Ochs <eduardoochs@gmail.com>
-#
+# 
 # Some eev-isms:
 # (defun c () (interactive) (eek "C-c C-e h h"))
 # (defun v () (interactive) (brg "~/edrxrepl/README.html"))
@@ -11,9 +11,9 @@
 # (defun cv () (interactive) (c) (v))
 #   (find-es "lua5" "Repl")
 #   (find-es "magit" "edrxrepl")
-#
+# 
 # (find-orgnode "Table of Contents")
-#+OPTIONS: toc:nil
+#+OPTIONS: toc:nil num:nil
 
 * Introduction
 This is a simple [[https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop][REPL]] for Lua.
