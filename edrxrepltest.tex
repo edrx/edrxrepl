@@ -1,0 +1,22 @@
+% This file:
+%   http://angg.twu.net/edrxrepl/edrxrepltest.tex.html
+%   http://angg.twu.net/edrxrepl/edrxrepltest.tex
+%           (find-angg "edrxrepl/edrxrepltest.tex")
+% Author: Eduardo Ochs <eduardoochs@gmail.com>
+% Version: 2021jan11
+% License: GPL3 at this moment.
+% If you need another license, get in touch!
+%
+% This is part of edrxrepl:
+%   https://github.com/edrx/edrxrepl#Introduction
+
+\documentclass{article}
+\begin{document}
+
+\directlua{dofile "edrxrepl.lua"}
+\directlua{print(); print(); print("Run REPL.stop = 1 to leave the REPL.")}
+\directlua{REPL = Repl.new(); REPL:repl()}
+
+\end{document}
+
+

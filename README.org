@@ -1,16 +1,51 @@
-* edrxrepl
-A simple [[https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop][REPL]] for Lua.
+# This file:
+#   http://angg.twu.net/edrxrepl/README.org.html
+#   http://angg.twu.net/edrxrepl/README.org
+#           (find-angg "edrxrepl/README.org")
+# Author: Eduardo Ochs <eduardoochs@gmail.com>
+#
+# Some eev-isms:
+# (defun c () (interactive) (eek "C-c C-e h h"))
+# (defun v () (interactive) (brg "~/edrxrepl/README.html"))
+# (defun e () (interactive) (find-angg "edrxrepl/README.org"))
+# (defun cv () (interactive) (c) (v))
+#   (find-es "lua5" "Repl")
+#   (find-es "magit" "edrxrepl")
+#
+# (find-orgnode "Table of Contents")
+#+OPTIONS: toc:nil
 
+* Introduction
+This is a simple [[https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop][REPL]] for Lua.
+
+# https://github.com/edrx/edrxrepl
 # (find-eepitch-intro)
 # (brg "~/edrxrepl/README.html")
 
 I wrote it because I was tired of not understanding the innards of Rob
 Hoelz's [[https://github.com/hoelzro/lua-repl/][lua-repl]]. As I use [[http://angg.twu.net/eev-intros/find-eepitch-intro.html][eepitch]] I need very few features from my
-REPLs.
+REPLs -- for example, I don't need history or completion.
 
-The documentation is [[http://angg.twu.net/edrxrepl/edrxrepl.lua.html][here]].
+The [[http://angg.twu.net/edrxrepl/edrxrepl.lua.html][code]] of this REPL is made of:
 
-An example of how to use it:
+- a few functions copied from my init file,
+
+- my implementation on OO in 5 lines (a commented version of it is
+  [[http://angg.twu.net/dednat6/dednat6/eoo.lua.html][here]]),
+
+- the class [[http://angg.twu.net/edrxrepl/edrxrepl.lua.html#MyXpcall][MyXpcall]], that is a hacker-friendly wrapper around Lua's
+  [[https://www.lua.org/manual/5.1/manual.html#pdf-xpcall][xpcall]]; I wrote it because I needed better error handling in [[http://angg.twu.net/dednat6/tug-slides.pdf#page=9][Dednat6]]
+  -- I needed several different error handlers, each with its own
+  [[https://www.lua.org/manual/5.1/manual.html#pdf-debug.traceback][traceback]].
+
+- the class [[http://angg.twu.net/edrxrepl/edrxrepl.lua.html#Repl][Repl]], that uses MyXpcall to run the user code. Once
+  MyXpcall was working the class Repl was trivial to write.
+
+The code is full of [[http://angg.twu.net/#eev][eev]]-isms, but they are all in comments and can be
+ignored. Some of the multi-line comments are [[http://angg.twu.net/eev-intros/find-eepitch-intro.html#3][test blocks]].
+
+Here's an example of how to use it from Lua. Note that the REPL uses
+~>>>~ and ~...~ for its prompts.
 
 #+BEGIN_SRC
 cd ~/edrxrepl/
@@ -33,4 +68,28 @@ nil	22
 /home/edrx/edrxrepl(edrx:sc)# 
 #+END_SRC
 
-Version: 2020nov03.
+And here is an example of how to use it from LuaLaTeX (without git!):
+
+#+BEGIN_SRC
+rm -Rfv /tmp/edrxrepl
+mkdir   /tmp/edrxrepl/
+cd      /tmp/edrxrepl/
+wget http://angg.twu.net/edrxrepl/edrxrepl.lua
+wget http://angg.twu.net/edrxrepl/edrxrepltest.tex
+lualatex edrxrepltest.tex
+#+END_SRC
+
+The body of [[http://angg.twu.net/edrxrepl/edrxrepltest.tex.html][edrxrepltest.tex]] is just this:
+
+#+BEGIN_SRC latex
+\documentclass{article}
+\begin{document}
+
+\directlua{dofile "edrxrepl.lua"}
+\directlua{print(); print(); print("Run REPL.stop = 1 to leave the REPL.")}
+\directlua{REPL = Repl.new(); REPL:repl()}
+
+\end{document}
+#+END_SRC
+
+Version: 2021jan11.

@@ -3,13 +3,14 @@
 --    http://angg.twu.net/edrxrepl/edrxrepl.lua
 --     (find-angg        "edrxrepl/edrxrepl.lua")
 --         https://github.com/edrx/edrxrepl
+--         https://github.com/edrx/edrxrepl#Introduction
 --
 -- In the HTML version the sexp hyperlinks work.
 -- See: (find-eev-quick-intro "3. Elisp hyperlinks")
 --      (find-eepitch-intro "3. Test blocks")
 --
 -- Author:  Eduardo Ochs <eduardoochs@gmail.com>
--- Version: 2020nov03
+-- Version: 2021jan11
 -- License: GPL3 at this moment.
 -- If you need another license, get in touch!
 
@@ -67,7 +68,7 @@ setmetatable(Class, Class)
 --
 -- «MyXpcall»  (to ".MyXpcall")
 -- See: (find-lua51manual "#pdf-xpcall" "xpcall (f, err)")
---      (find-lua52manual "#pdf-xpcall" "xpcall (f, msgh [, arg1, ···])")
+--      (find-lua52manual "#pdf-xpcall" "xpcall (f, msgh [, arg1, ...])")
 --      (find-lua51manual "#pdf-debug.traceback")
 --      (find-lua51manual "#pdf-error")
 --      (find-es "lua5" "xpcall-2020")
