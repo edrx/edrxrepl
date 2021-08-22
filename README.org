@@ -1,17 +1,20 @@
 # This file:
-#   http://angg.twu.net/edrxrepl/README.org.html
-#   http://angg.twu.net/edrxrepl/README.org
-#           (find-angg "edrxrepl/README.org")
+#   https://github.com/edrx/edrxrepl/
+#       http://angg.twu.net/edrxrepl/README.org.html
+#       http://angg.twu.net/edrxrepl/README.org
+#               (find-angg "edrxrepl/README.org")
+#               (find-angg "edrxrepl/")
 # Author: Eduardo Ochs <eduardoochs@gmail.com>
 # 
 # Some eev-isms:
-# (defun c () (interactive) (eek "C-c C-e h h"))
-# (defun v () (interactive) (brg "~/edrxrepl/README.html"))
-# (defun e () (interactive) (find-angg "edrxrepl/README.org"))
+# (defun c  () (interactive) (eek "C-c C-e h h"))
+# (defun o  () (interactive) (find-angg "edrxrepl/README.org"))
+# (defun v  () (interactive) (brg     "~/edrxrepl/README.html"))
 # (defun cv () (interactive) (c) (v))
 #   (find-es "lua5" "Repl")
 #   (find-es "magit" "edrxrepl")
 # 
+# (find-mygitrepo-links "edrxrepl")
 # (find-orgnode "Table of Contents")
 #+OPTIONS: toc:nil num:nil
 
@@ -28,15 +31,15 @@ REPLs -- for example, I don't need history or completion.
 
 The [[http://angg.twu.net/edrxrepl/edrxrepl.lua.html][code]] of this REPL is made of:
 
-- a few functions copied from my init file,
+- a few functions copied from my [[http://angg.twu.net/LUA/lua50init.lua.html][init file]],
 
 - my implementation on OO in 5 lines (a commented version of it is
   [[http://angg.twu.net/dednat6/dednat6/eoo.lua.html][here]]),
 
 - the class [[http://angg.twu.net/edrxrepl/edrxrepl.lua.html#MyXpcall][MyXpcall]], that is a hacker-friendly wrapper around Lua's
   [[https://www.lua.org/manual/5.1/manual.html#pdf-xpcall][xpcall]]; I wrote it because I needed better error handling in [[http://angg.twu.net/dednat6/tug-slides.pdf#page=9][Dednat6]]
-  -- I needed several different error handlers, each with its own
-  [[https://www.lua.org/manual/5.1/manual.html#pdf-debug.traceback][traceback]].
+  -- I need several different error handlers, each with its own
+  [[https://www.lua.org/manual/5.1/manual.html#pdf-debug.traceback][traceback function]].
 
 - the class [[http://angg.twu.net/edrxrepl/edrxrepl.lua.html#Repl][Repl]], that uses MyXpcall to run the user code. Once
   MyXpcall was working the class Repl was trivial to write.
@@ -92,4 +95,41 @@ The body of [[http://angg.twu.net/edrxrepl/edrxrepltest.tex.html][edrxrepltest.t
 \end{document}
 #+END_SRC
 
-Version: 2021jan11.
+I am also using this in emacs-lua, that as this moment is just a messy
+prototype.
+
+
+
+#+begin_comment
+ (eepitch-shell)
+ (eepitch-kill)
+ (eepitch-shell)
+cd ~/edrxrepl/
+laf
+rm -v *~
+rm -v *.html
+
+# (find-fline   "~/edrxrepl/")
+# (magit-status "~/edrxrepl/")
+# (find-gitk    "~/edrxrepl/")
+#
+#   (s)tage all changes
+#   (c)ommit -> (c)reate
+#   (P)ush -> (p)ushremote
+#   https://github.com/edrx/edrxrepl
+#
+
+# (find-fline "~/" "edrxrepl")
+# (find-fline "~/edrxrepl/")
+# (find-fline "~/edrxrepl-new/")
+
+cd ~/edrxrepl/
+git clone https://github.com/edrx/edrxrepl .
+
+#+end_comment
+
+# Local Variables:
+# coding:               utf-8-unix
+# modes:                (org-mode fundamental-mode)
+# org-html-postamble:   nil
+# End:
