@@ -95,7 +95,7 @@ The body of [[http://angg.twu.net/edrxrepl/edrxrepltest.tex.html][edrxrepltest.t
 \end{document}
 #+END_SRC
 
-I am also using this in emacs-lua, that as this moment is just a messy
+I am also using this in emacs-lua, that at this moment is just a messy
 prototype.
 
 
@@ -118,14 +118,6 @@ rm -v *.html
 #   (P)ush -> (p)ushremote
 #   https://github.com/edrx/edrxrepl
 #
-
-# (find-fline "~/" "edrxrepl")
-# (find-fline "~/edrxrepl/")
-# (find-fline "~/edrxrepl-new/")
-
-cd ~/edrxrepl/
-git clone https://github.com/edrx/edrxrepl .
-
 #+end_comment
 
 # Local Variables:
