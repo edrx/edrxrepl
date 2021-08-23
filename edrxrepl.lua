@@ -15,6 +15,7 @@
 -- If you need another license, get in touch!
 --
 -- (defun l () (interactive) (find-angg "edrxrepl/edrxrepl.lua"))
+-- (defun o () (interactive) (find-angg "edrxrepl/README.org"))
 
 
 
@@ -49,6 +50,18 @@ splitlines = function (bigstr)
       table.remove(arr)
     end
     return arr
+  end
+
+map = function (f, arr, n)
+    local brr = {}
+    for i=1,(n or #arr) do tinsert(brr, (f(arr[i]))) end
+    return brr
+  end
+mapconcat = function (f, arr, sep, n)
+    return table.concat(map(f, arr, n), sep)
+  end
+mapconcatpacked = function (f, arr, sep)
+    return mapconcat(f or tostring, arr, sep or "  ", arr.n)
   end
 
 
@@ -162,7 +175,7 @@ MyXpcall = Class {
         return function (...)
             myx.eh_args = pack(...)
             myx:tb()
-	    if not myx.quiet then print(myx.tbshorter) end
+	    -- if not myx.quiet then print(myx.tb_shorter) end
             return "(eh returns this)"
           end
       end,
@@ -174,6 +187,7 @@ MyXpcall = Class {
     tbargs  = function (myx) return myx:errmsg(), myx.tb_lvl end,
     results = function (myx) return unpack(myx.f_results) end,
     ret     = function (myx) if myx:success() then return myx:results() end end,
+    tbmsg   = function (myx) return myx.tb_shorter end,
   },
 }
 
@@ -261,18 +275,16 @@ Repl = Class {
   type = "Repl",
   new  = function () return Repl({}) end,
   __index = {
-    bigstr = function (r)
-        return table.concat(r.lines, "\n")
-      end,
-    errincomplete = function (r, err)
-        return err:find(" near '?<eof>'?$")
-      end,
+    bigstr = function (r) return table.concat(r.lines, "\n") end,
+    code = function (r) return r:bigstr():gsub("^=", "return ") end,
+    --
+    incompletep = function (r) return r:incompletep0(r:code()) end,
     incompletep0 = function (r, bigstr)
         local f, err = loadstring(bigstr)
         return (f == nil) and r:errincomplete(err)
       end,
-    code = function (r) return r:bigstr():gsub("^=", "return ") end,
-    incompletep = function (r) return r:incompletep0(r:code()) end,
+    errincomplete = function (r, err) return err:find(" near '?<eof>'?$") end,
+    --
     read00 = function (r, prompt) io.write(prompt); return io.read() end,
     read0 = function (r, prompt) table.insert(r.lines, r:read00(prompt)) end,
     read1 = function (r) return r:read0 ">>> "  end,
@@ -296,11 +308,51 @@ Repl = Class {
     -- The standard interface:
     repl = function (r) while not r.stop do r:read():evalprint() end end,
     --
+    -- New:
+    newrepl = function (r) while not r.stop do r:newreadevalprint() end end,
+    newreadevalprint = function (r)
+        r.lines = {}
+        r:read1()
+        while r:trapincomplete() do r:read2() end
+        if r:trapcomperror() then return r:printcomperror() end
+        if r:trapexecerror() then return r:printexecerror() end
+        if r:bigstr():match("^=")
+	then return r:successprint()
+        else return r:successnonprint()
+        end
+      end,
+    trapincomplete = function (r)
+        r.f, r.err = loadstring(r:code())
+        return (r.err and r:errincomplete(r.err)) and "[incomplete]"
+      end,
+    trapcomperror = function (r)
+        r.f, r.err = loadstring(r:code())
+        return r.err and "[comp error]"
+      end,
+    trapexecerror = function (r)
+        r.myx = MyXpcall.new():setquiet(r.quiet):call0(r.f)
+	if not r.myx:success() then
+	  r.err = r.myx:errmsg()
+	  t.rb  = r.myx:tbmsg()
+	  return "[exec error]"
+        end
+      end,
+    printcomperror = function (r) print(r.err) end,
+    printexecerror = function (r) print(r.myx:tbmsg()) end,
+    successprint    = function (r) print(unpack(r.myx.f_results)) end,
+    successnonprint = function (r) end,
+    --
     --
     -- «Repl-emacs-lua»  (to ".Repl-emacs-lua")
     -- See: (find-es "lua5" "Repl-emacs-lua")
     --        http://angg.twu.net/emacs-lua/
     -- An interface for using this inside emacs-lua.
+    erepltest = function (r)
+        while not r.stop do
+          print(r:esend(r:read00(r:eprompt())))
+        end
+      end,
+    --
     e0 = function (r) r.lines = {}; return r end, -- clear .lines
     eprompt = function (r)
         r.lines = r.lines or {}
@@ -322,25 +374,26 @@ Repl = Class {
       end,
     etrapcomperror  = function (r)
 	r.f, r.err = loadstring(r:code())
-	if not r.f then r:e0(); return "comp error" end
+	if not r.f then r:e0(); return "[comp error]" end
       end,
     etrapexecerror = function (r)
 	r.myx = MyXpcall.new():setquiet(r.quiet):call0(r.f)
-	return not r.myx:success()
+	if not r.myx:success() then
+	  r.err, r.tb = r.myx:errmsg(), r.myx:tbmsg()
+	  return "[exec error]"
+        end
       end,
     --
     eretincomplete      = function (r) return "(incomplete)" end,
     eretcomperror       = function (r) return "(comp error)", r.err end,
-    eretexecerror       = function (r) return "(exec error)", r.err end,
-    eretsuccessnonprint = function (r) return "(success)" end,
-    eretsuccessprint    = function (r) return "(success: =)", tos_packed(r.myx.f_results) end,
-    --
-    eprint           = function (r) r:print() end,
-    esuccessprint0   = function (r) return "(success: =)", r:eprint0() end,
-    eprint0          = function (r)
-        return mytostring_arg(r.myx.f_results)
+    eretexecerror       = function (r)
+        return "(exec error)", format("<%s>\n<<%s>>", r.err, r.tb)
       end,
-    --
+    eretsuccessnonprint = function (r) return "(success)" end,
+    eretsuccessprint    = function (r)
+        r.rslts = mapconcatpacked(nil, r.myx.f_results)
+        return "(success: =)", r.rslts
+      end,
   },
 }
 
@@ -365,14 +418,15 @@ PP()
  (eepitch-lua51)
 dofile "edrxrepl.lua"
 REPL = Repl.new()
-REPL:repl()
+-- REPL:repl()
+REPL:newrepl()
 
 print(
   1+2
 )
 = 1+2
 = 1, 2, 3
-= nil, 22
+= nil, 22, nil
 =
 
 fcode = function (n)
@@ -391,13 +445,26 @@ print(eval)
 
 
 -- «Repl-emacs-lua-tests»  (to ".Repl-emacs-lua-tests")
+-- (find-es "lua5" "Repl-emacs-lua")
 --[[
  (eepitch-lua51)
  (eepitch-kill)
  (eepitch-lua51)
 dofile "edrxrepl.lua"
 REPL = Repl.new()
-REPL:repl()
+REPL:erepltest()
+a = 22
+a = a + 33
+a = a +
+    200
+= a
+= a +
+  2 +
+  3
+= a +
+  2 +
+  nil
+REPL.stop = 1
 
 --]]
 

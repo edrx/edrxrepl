@@ -8,9 +8,12 @@
 # 
 # Some eev-isms:
 # (defun c  () (interactive) (eek "C-c C-e h h"))
+# (defun l  () (interactive) (find-angg "edrxrepl/edrxrepl.lua"))
 # (defun o  () (interactive) (find-angg "edrxrepl/README.org"))
 # (defun v  () (interactive) (brg     "~/edrxrepl/README.html"))
 # (defun cv () (interactive) (c) (v))
+# (defun er () (interactive) (find-es "lua5" "Repl-emacs-lua"))
+# (defun e  () (interactive) (find-es "lua5"))
 #   (find-es "lua5" "Repl")
 #   (find-es "magit" "edrxrepl")
 # 
