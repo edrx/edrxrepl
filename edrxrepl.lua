@@ -160,8 +160,8 @@ EdrxRepl = Class {
       end,
     eretincomplete = function (r) return "(incomplete)" end,
     eretcomperror  = function (r) return "(comp error)", r.err end,
-    eretexecerror  = function (r) return "(exec error)", r.xpc:prout() end,
-    eretsuccessprint = function (r) return "(success: =)", r.xpc:prout("=") end,
+    eretexecerror  = function (r) return "(exec error)", r.xpc:prout(nil, "\n") end,
+    eretsuccessprint = function (r) return "(success: =)", r.xpc:prout("=", "\n") end,
     eretsuccessnonprint = function (r) return "(success)", r.xpc:prout() end,
   },
 }

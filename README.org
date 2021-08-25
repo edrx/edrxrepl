@@ -58,7 +58,7 @@ cd ~/edrxrepl/
 /home/edrx/edrxrepl(edrx:sc)# lua5.3
 Lua 5.3.3  Copyright (C) 1994-2016 Lua.org, PUC-Rio
 > dofile "edrxrepl.lua"
-> REPL = Repl.new(); REPL:repl()
+> REPL = EdrxRepl.new(); REPL:repl()
 >>> print(
 ...   1+2
 ... )
@@ -93,7 +93,7 @@ The body of [[http://angg.twu.net/edrxrepl/edrxrepltest.tex.html][edrxrepltest.t
 
 \directlua{dofile "edrxrepl.lua"}
 \directlua{print(); print(); print("Run REPL.stop = 1 to leave the REPL.")}
-\directlua{REPL = Repl.new(); REPL:repl()}
+\directlua{REPL = EdrxRepl.new(); REPL:repl()}
 
 \end{document}
 #+END_SRC

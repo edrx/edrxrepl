@@ -48,13 +48,15 @@
 -- eoo.lua, it saves all the intermediate values, and all its methods
 -- can be overridden.
 --
--- The four high-level ways of calling function with EdrxPcall are
+-- The six high-level ways of calling function with EdrxPcall are
 -- these ones:
 --
 --   EdrxPcall.new():  call(F2, 3, 4):  out()
 --   EdrxPcall.new():  call(F2, 3, 4):  out("=")
+--   EdrxPcall.new():  call(F2, 3, 4):  out("=", "\n")
 --   EdrxPcall.new():prcall(F2, 3, 4):prout()
 --   EdrxPcall.new():prcall(F2, 3, 4):prout("=")
+--   EdrxPcall.new():prcall(F2, 3, 4):prout("=", "\n")
 --
 -- The option "=" behaves like an initial "=" in the REPLs of Lua5.1
 -- and Lua5.2, in the sense that it makes the results of F2(3, 4) be
@@ -62,6 +64,14 @@
 -- outputs of the "print"s called by F2(3, 4) to a string before
 -- printing them, and used by emacs-lua. To understand how all this
 -- works try the tests at the end of this file.
+--
+-- The alternatives with "\n" are harder to explain. Remember that in
+-- the REPLs of Lua5.1 and Lua5.1 typing something like "= <exprs>" at
+-- the REPL only prints something when "<exprs>" return something, and
+-- remember that "return", "return nil", are "return nil, nil" are all
+-- different, as they return lists of values of length 0, 1, and 2...
+-- The option "\n" at the end adds a "\n" at the end of the output
+-- only when the "=" receives a non-empty list of values.
 
 
 
@@ -123,12 +133,17 @@ setmetatable(Class, Class)
 
 
 -- «EdrxPcall»  (to ".EdrxPcall")
+-- My class for calling xpcall in configurable ways.
+-- See the introduction at the top of this file.
 --
 EdrxPcall = Class {
   type = "EdrxPcall",
   new  = function (T) return EdrxPcall(T or {}) end,
   __tostring = tos_VTable,
   __index = {
+    --
+    -- The method :call(f, ...) is the standard way to call
+    -- a function with arguments in protected mode.
     call = function (xpc, f, ...)
         return xpc:callprep(f, ...):callrun()
       end,
@@ -146,6 +161,8 @@ EdrxPcall = Class {
         return xpc
       end,
     --
+    -- Error handler (eh) and traceback (tb).
+    -- The method xpc:eh0() returns the error handler xpc.eh.
     eh0 = function (xpc)
         return function (errmsg)
 	    xpc.err_msg = errmsg
@@ -158,25 +175,42 @@ EdrxPcall = Class {
     tb_lvl = 3,
     tb_e   = 6,
     --
-    success = function (xpc) return xpc.xp_results[1] end,
-    results = function (xpc) return myunpack(xpc.f_results) end,
-    tbshorter = function (xpc)
+    -- The method :out() returns the "output" of the call.
+    -- For example:
+    --   EdrxPcall.new():call(expr, "2,    3"):out("=")        --> "2  3"
+    --   EdrxPcall.new():call(expr, "2,    3"):out("=", "\n")  --> "2  3\n"
+    --   EdrxPcall.new():call(expr, "2,    3"):out()           --> ""
+    --   EdrxPcall.new():call(expr, "2 + nil"):out()           --> errmsg/traceback
+    success      = function (xpc) return xpc.xp_results[1] end,
+    resultsempty = function (xpc) return (xpc.xp_results.n == 0) and "" end,
+    results0000 = function (xpc) return myunpack(xpc.f_results) end,
+    results000  = function (xpc) return print_to_string(xpc:results0000()) end,
+    results00   = function (xpc, nl) return xpc:results000()..(nl or "") end,
+    results0    = function (xpc, nl) return xpc:resultsempty() or xpc:results00(nl) end,
+    results     = function (xpc, printresults, nl)
+        if printresults then return xpc:results0(nl) end
+        return ""
+      end,
+    tbshorter = function (xpc, tbe)
         local lines = splitlines(xpc.tb_string)
-	return table.concat(lines, "\n", 1, #lines - (xpc.tb_e or 6))
+	return table.concat(lines, "\n", 1, #lines - (tbe or xpc.tb_e))
       end,
-    outsuccess = function (xpc)
-        return print_to_string(xpc:results())
+    outerror = function (xpc, nl)
+        return xpc.err_msg .. xpc:tbshorter() .. (nl or "")
       end,
-    outerror = function (xpc)
-        return xpc.err_msg .. xpc:tbshorter()
-      end,
-    out = function (xpc, printresults)
+    out = function (xpc, printresults, nl)
         if xpc:success()
-        then return (printresults and xpc:outsuccess()) or ""
-        else return xpc:outerror()
+        then return xpc:results(printresults, nl)
+        else return xpc:outerror(nl)
         end
       end,
     --
+    -- The method :prcall(f, ...) is a variant of :call that
+    --   "captures the outputs of the prints in :call(f, ...)". 
+    -- The method :prout() returns the "output" of the call,
+    --   _including the outputs of all "print"s in the call_.
+    -- The method :pr0() creates the setup for capturing "print"s.
+    -- The method :pr1() puts the outputs in xpc.pr_out.
     pr0 = function (xpc)
         xpc.pr_list = {}
         xpc.pr_oldprint = print
@@ -193,8 +227,8 @@ EdrxPcall = Class {
     prcall = function (xpc, ...)
         return xpc:pr0():call(...):pr1()
       end,
-    prout = function (xpc, printresults)
-        return xpc.pr_out .. xpc:out(printresults)
+    prout = function (xpc, printresults, nl)
+        return xpc.pr_out .. xpc:out(printresults, nl)
       end,
   },
 }
@@ -206,6 +240,11 @@ EdrxPcall = Class {
  (eepitch-kill)
  (eepitch-lua51)
 dofile "edrxpcall.lua"
+
+= EdrxPcall.new():call(expr, "2,    3"):out("=", "\n")  --> "2  3\n"
+= EdrxPcall.new():call(expr, "2,    3"):out("=")        --> "2  3"
+= EdrxPcall.new():call(expr, "2,    3"):out()     --> ""
+= EdrxPcall.new():call(expr, "2 + nil"):out()     --> errmsg/traceback
 
 F2  = function (a, b) print("F2",  a, b); return F1(2, 3), 4 end
 F1  = function (a, b) print("F1",  a, b); return F0(1, 2), 3 end
